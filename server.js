@@ -763,13 +763,6 @@ app.get('/api/status', (req, res) => {
 const OG_IMAGE_CACHE = { buffer: null, fetched: 0 };
 const OG_IMAGE_TTL = 15000;
 
-function hexToRgbaInt(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return { r, g, b, a: 255 };
-}
-
 app.get('/og-image.png', async (req, res) => {
   try {
     const now = Date.now();
@@ -782,80 +775,55 @@ app.get('/og-image.png', async (req, res) => {
     const d2 = currentPlayers.destiny2 || 0;
     const mara = currentPlayers.marathon || 0;
 
-    const width = 1200;
-    const height = 630;
-    const img = new Jimp(width, height, 0x0a0a0f);
+    const img = new Jimp(1200, 630, '#0a0a0f');
 
-    const bg = new Jimp(width, height, '#0a0a0f');
-    img.composite(bg, 0, 0);
+    const white64 = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
+    const white32 = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
+    const white16 = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
+    const black32 = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
 
-    const font64 = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
-    const font32 = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
-    const font16 = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
-
-    const printCentered = (font, text, y, color) => {
-      const textWidth = Jimp.measureText(font, text);
-      const x = (width - textWidth) / 2;
-      const fnt = color ? { ...font } : font;
-      if (img.constructor.name === 'Jimp') {
-        img.print(font, x, y, text);
-      }
-    };
-
-    const logoText = 'DESTINY 2  vs  MARATHON';
-    const tw = Jimp.measureText(font32, logoText);
-    img.print(font32, (width - tw) / 2, 60, logoText);
-
-    const d2Label = 'Destiny 2';
-    const d2w = Jimp.measureText(font64, d2Label);
-    img.print(font64, 200, 180, Jimp.loadFont(Jimp.FONT_SANS_64_BLACK));
+    const title = 'DESTINY 2  vs  MARATHON';
+    const tw = Jimp.measureText(white32, title);
+    img.print(white32, (1200 - tw) / 2, 50, title);
 
     const d2Count = d2.toLocaleString();
-    const mcLabel = 'Marathon';
-    const mcw = Jimp.measureText(font64, mcLabel);
-    const mcCount = mara.toLocaleString();
+    const maraCount = mara.toLocaleString();
 
-    const d2Font = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
-    const mcFont = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
+    img.print(white64, 120, 170, 'Destiny 2');
+    img.print(white64, 120, 250, d2Count);
+    img.print(white16, 120, 330, 'Steam Concurrent Players');
 
-    img.print(d2Font, 160, 180, 'Destiny 2');
-    img.print(font64, 160, 260, d2Count);
-    img.print(font16, 160, 340, 'Steam Concurrent Players');
+    img.print(white64, 780, 170, 'Marathon');
+    img.print(white64, 780, 250, maraCount);
+    img.print(white16, 780, 330, 'Steam Concurrent Players');
 
-    img.print(d2Font, 840, 180, 'Marathon');
-    img.print(font64, 840, 260, mcCount);
-    img.print(font16, 840, 340, 'Steam Concurrent Players');
+    const vsw = Jimp.measureText(white32, 'VS');
+    img.print(white32, (1200 - vsw) / 2, 250, 'VS');
 
-    const vsFont = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
-    const vsw = Jimp.measureText(vsFont, 'VS');
-    img.print(vsFont, (width - vsw) / 2, 260, 'VS');
-
-    const barY = 420;
-    const barH = 8;
+    const barY = 410;
+    const barH = 12;
     const total = d2 + mara || 1;
-    const d2BarW = Math.round((width - 120) * (d2 / total));
-    const maraBarW = Math.round((width - 120) * (mara / total));
+    const d2BarW = Math.round((1200 - 120) * (d2 / total));
 
     for (let x = 60; x < 60 + d2BarW; x++) {
       for (let y = barY; y < barY + barH; y++) {
-        if (x < width - 60) img.setPixelColor(0x0099ffff, x, y);
+        img.setPixelColor(Jimp.rgbaToInt(0, 153, 255, 255), x, y);
       }
     }
-    for (let x = 60 + d2BarW; x < 60 + d2BarW + maraBarW; x++) {
+    for (let x = 60 + d2BarW; x < 1140; x++) {
       for (let y = barY; y < barY + barH; y++) {
-        if (x < width - 60) img.setPixelColor(0xff6b00ff, x, y);
+        img.setPixelColor(Jimp.rgbaToInt(255, 107, 0, 255), x, y);
       }
     }
 
     const d2Pct = Math.round(d2 / total * 100);
     const maraPct = Math.round(mara / total * 100);
-    const pctFont = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
-    img.print(pctFont, 60, barY + 16, `D2 ${d2Pct}%`);
-    img.print(pctFont, width - 120, barY + 16, `Mara ${maraPct}%`);
+    img.print(white16, 60, barY + 18, `Destiny 2 ${d2Pct}%`);
+    img.print(white16, 960, barY + 18, `Marathon ${maraPct}%`);
 
-    const footer = 'destiny-marathon-counter.onrender.com  •  Data from Steam API';
-    const fw = Jimp.measureText(font16, footer);
-    img.print(font16, (width - fw) / 2, 540, footer);
+    const footer = 'destiny-marathon-counter.onrender.com  •  Live data from Steam API';
+    const fw = Jimp.measureText(white16, footer);
+    img.print(white16, (1200 - fw) / 2, 540, footer);
 
     const buffer = await img.getBufferAsync(Jimp.MIME_PNG);
     OG_IMAGE_CACHE.buffer = buffer;
@@ -865,6 +833,7 @@ app.get('/og-image.png', async (req, res) => {
     res.set('Cache-Control', 'public, max-age=15');
     res.send(buffer);
   } catch (err) {
+    console.error('OG image error:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
