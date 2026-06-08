@@ -4,7 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
-const Jimp = require('jimp');
+const sharp = require('sharp');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -774,58 +774,32 @@ app.get('/og-image.png', async (req, res) => {
 
     const d2 = currentPlayers.destiny2 || 0;
     const mara = currentPlayers.marathon || 0;
-
-    const img = new Jimp(1200, 630, '#0a0a0f');
-
-    const white64 = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE);
-    const white32 = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
-    const white16 = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
-    const black32 = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
-
-    const title = 'DESTINY 2  vs  MARATHON';
-    const tw = Jimp.measureText(white32, title);
-    img.print(white32, (1200 - tw) / 2, 50, title);
-
-    const d2Count = d2.toLocaleString();
-    const maraCount = mara.toLocaleString();
-
-    img.print(white64, 120, 170, 'Destiny 2');
-    img.print(white64, 120, 250, d2Count);
-    img.print(white16, 120, 330, 'Steam Concurrent Players');
-
-    img.print(white64, 780, 170, 'Marathon');
-    img.print(white64, 780, 250, maraCount);
-    img.print(white16, 780, 330, 'Steam Concurrent Players');
-
-    const vsw = Jimp.measureText(white32, 'VS');
-    img.print(white32, (1200 - vsw) / 2, 250, 'VS');
-
-    const barY = 410;
-    const barH = 12;
     const total = d2 + mara || 1;
-    const d2BarW = Math.round((1200 - 120) * (d2 / total));
-
-    for (let x = 60; x < 60 + d2BarW; x++) {
-      for (let y = barY; y < barY + barH; y++) {
-        img.setPixelColor(Jimp.rgbaToInt(0, 153, 255, 255), x, y);
-      }
-    }
-    for (let x = 60 + d2BarW; x < 1140; x++) {
-      for (let y = barY; y < barY + barH; y++) {
-        img.setPixelColor(Jimp.rgbaToInt(255, 107, 0, 255), x, y);
-      }
-    }
-
     const d2Pct = Math.round(d2 / total * 100);
     const maraPct = Math.round(mara / total * 100);
-    img.print(white16, 60, barY + 18, `Destiny 2 ${d2Pct}%`);
-    img.print(white16, 960, barY + 18, `Marathon ${maraPct}%`);
+    const barTotal = 1080;
+    const d2BarPx = Math.round(barTotal * (d2 / total));
+    const maraBarPx = Math.round(barTotal * (mara / total));
 
-    const footer = 'destiny-marathon-counter.onrender.com  •  Live data from Steam API';
-    const fw = Jimp.measureText(white16, footer);
-    img.print(white16, (1200 - fw) / 2, 540, footer);
+    const svg = `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+      <rect width="1200" height="630" fill="#0a0a0f"/>
+      <text x="600" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="rgba(255,255,255,0.6)" letter-spacing="6">DESTINY 2  vs  MARATHON</text>
+      <text x="130" y="190" font-family="Arial, sans-serif" font-size="52" font-weight="900" fill="#0099ff">Destiny 2</text>
+      <text x="130" y="270" font-family="Arial, sans-serif" font-size="72" font-weight="900" fill="#ffffff">${d2.toLocaleString()}</text>
+      <text x="130" y="310" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.3)">Steam Concurrent Players</text>
+      <text x="1070" y="190" text-anchor="end" font-family="Arial, sans-serif" font-size="52" font-weight="900" fill="#ff6b00">Marathon</text>
+      <text x="1070" y="270" text-anchor="end" font-family="Arial, sans-serif" font-size="72" font-weight="900" fill="#ffffff">${mara.toLocaleString()}</text>
+      <text x="1070" y="310" text-anchor="end" font-family="Arial, sans-serif" font-size="18" fill="rgba(255,255,255,0.3)">Steam Concurrent Players</text>
+      <text x="600" y="260" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="rgba(255,255,255,0.15)">VS</text>
+      <rect x="60" y="410" width="${d2BarPx}" height="12" rx="6" fill="#0099ff"/>
+      <rect x="${60 + d2BarPx}" y="410" width="${maraBarPx}" height="12" rx="6" fill="#ff6b00"/>
+      <text x="130" y="448" font-family="Arial, sans-serif" font-size="16" fill="rgba(255,255,255,0.5)">Destiny 2 ${d2Pct}%</text>
+      <text x="1070" y="448" text-anchor="end" font-family="Arial, sans-serif" font-size="16" fill="rgba(255,255,255,0.5)">Marathon ${maraPct}%</text>
+      <text x="600" y="560" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="rgba(255,255,255,0.2)">destiny-marathon-counter.onrender.com  •  Live data from Steam API</text>
+    </svg>`;
 
-    const buffer = await img.getBufferAsync(Jimp.MIME_PNG);
+    const buffer = await sharp(Buffer.from(svg)).png().toBuffer();
+
     OG_IMAGE_CACHE.buffer = buffer;
     OG_IMAGE_CACHE.fetched = now;
 
