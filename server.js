@@ -690,12 +690,64 @@ app.get('/api/twitch/streams', async (req, res) => {
   }
 });
 
-app.get('/api/twitch/top-streamers', (req, res) => {
-  res.json({
-    streamers: TOP_D2_STREAMERS,
-    total: TOP_D2_STREAMERS.length,
-    embedUrl: 'https://player.twitch.tv/?channel=CHANNEL&parent=localhost&parent=destiny-marathon-counter.onrender.com'
-  });
+const TWITCH_STATUS_CACHE = { data: null, fetched: 0 };
+const TWITCH_STATUS_TTL = 60000;
+
+async function checkTwitchLiveStatus(streamers) {
+  try {
+    const loginParams = streamers.map(s => `login=${encodeURIComponent(s)}`).join('&');
+    const r = await axios.get(`https://api.ivr.fi/v2/twitch/user?${loginParams}`, {
+      timeout: 10000,
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+    const users = r.data || [];
+    const statuses = {};
+    users.forEach(u => {
+      statuses[u.login.toLowerCase()] = { live: !!u.stream, game: u.stream?.game || null, title: u.stream?.title || null, viewers: u.stream?.viewers || 0 };
+    });
+    return statuses;
+  } catch {
+    return {};
+  }
+}
+
+app.get('/api/twitch/top-streamers', async (req, res) => {
+  try {
+    const now = Date.now();
+    let statuses = {};
+    if (TWITCH_STATUS_CACHE.data && (now - TWITCH_STATUS_CACHE.fetched) < TWITCH_STATUS_TTL) {
+      statuses = TWITCH_STATUS_CACHE.data;
+    } else {
+      statuses = await checkTwitchLiveStatus(TOP_D2_STREAMERS);
+      TWITCH_STATUS_CACHE.data = statuses;
+      TWITCH_STATUS_CACHE.fetched = now;
+    }
+
+    const sorted = [...TOP_D2_STREAMERS].sort((a, b) => {
+      const aLive = statuses[a.toLowerCase()]?.live || false;
+      const bLive = statuses[b.toLowerCase()]?.live || false;
+      if (aLive && !bLive) return -1;
+      if (!aLive && bLive) return 1;
+      return 0;
+    });
+
+    const streamerData = sorted.map(name => {
+      const s = statuses[name.toLowerCase()] || { live: false, game: null, title: null, viewers: 0 };
+      return { name, ...s };
+    });
+
+    res.json({
+      streamers: streamerData,
+      total: streamerData.length,
+      liveCount: streamerData.filter(s => s.live).length
+    });
+  } catch (err) {
+    res.json({
+      streamers: TOP_D2_STREAMERS.map(name => ({ name, live: false, game: null, title: null, viewers: 0 })),
+      total: TOP_D2_STREAMERS.length,
+      liveCount: 0
+    });
+  }
 });
 
 app.get('/api/status', (req, res) => {

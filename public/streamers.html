@@ -15,6 +15,13 @@
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 .streamer-card .open-link { font-size: 11px; color: rgba(255,255,255,0.3); text-decoration: none; }
 .streamer-card .open-link:hover { color: #0099ff; }
+.streamer-card.offline { opacity: 0.3; }
+.streamer-card.offline:hover { opacity: 0.6; }
+.streamer-card .live-badge { display: inline-block; font-size: 9px; font-weight: 700; background: #ef4444; color: #fff; padding: 1px 6px; border-radius: 3px; margin-left: 6px; letter-spacing: 0.5px; }
+.streamer-card .off-badge { display: inline-block; font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.25); margin-left: 6px; }
+.streamer-card .live-dot.off { background: rgba(255,255,255,0.15); animation: none; }
+.streamer-card .viewers { font-size: 10px; color: rgba(255,255,255,0.3); margin-left: 8px; }
+.streamer-card .stream-title { font-size: 11px; color: rgba(255,255,255,0.4); padding: 0 16px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .directory-embed { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 20px; }
 .directory-embed h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.3); margin-bottom: 12px; }
 .directory-links { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -34,7 +41,7 @@
 <div class="container">
   <div class="header">
     <h1>Destiny 2 Streamers</h1>
-    <div class="subtitle">Live Twitch embeds — click play to watch</div>
+    <div class="subtitle">Live Twitch embeds — sorted by live status, refreshes every 60s</div>
     <div class="update-status" id="status">Loading...</div>
   </div>
 
@@ -68,20 +75,30 @@ async function loadStreamers() {
     const parent = window.location.hostname;
     const grid = document.getElementById('streamerGrid');
 
-    grid.innerHTML = data.streamers.map(channel => `
-      <div class="streamer-card">
-        <iframe src="https://player.twitch.tv/?channel=${channel}&parent=${parent}&autoplay=false" allowfullscreen referrerpolicy="no-referrer"></iframe>
+    const sorted = [...data.streamers].sort((a, b) => {
+      if (a.live && !b.live) return -1;
+      if (!a.live && b.live) return 1;
+      return 0;
+    });
+
+    grid.innerHTML = sorted.map(s => `
+      <div class="streamer-card${s.live ? '' : ' offline'}">
+        <iframe src="https://player.twitch.tv/?channel=${s.name}&parent=${parent}&autoplay=false" allowfullscreen referrerpolicy="no-referrer"></iframe>
         <div class="info">
           <div>
-            <span class="live-dot"></span>
-            <span class="name">${channel}</span>
+            <span class="live-dot${s.live ? '' : ' off'}"></span>
+            <span class="name">${s.name}</span>
+            ${s.live ? '<span class="live-badge">LIVE</span>' : '<span class="off-badge">offline</span>'}
+            ${s.live && s.viewers ? `<span class="viewers">${s.viewers.toLocaleString()} viewers</span>` : ''}
           </div>
-          <a class="open-link" href="https://www.twitch.tv/${channel}" target="_blank">Open on Twitch →</a>
+          <a class="open-link" href="https://www.twitch.tv/${s.name}" target="_blank">${s.live ? 'Watch →' : 'Open →'}</a>
         </div>
+        ${s.live && s.title ? `<div class="stream-title">${escHtml(s.title)}</div>` : ''}
       </div>
     `).join('');
 
-    status.textContent = data.total + ' streamers loaded';
+    const live = data.liveCount || 0;
+    status.textContent = live + '/' + data.total + ' live';
     status.className = 'update-status live';
   } catch (err) {
     status.textContent = 'Error: ' + err.message;
@@ -89,7 +106,14 @@ async function loadStreamers() {
   }
 }
 
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
 loadStreamers();
+setInterval(loadStreamers, 60000);
 </script>
 </body>
 </html>
