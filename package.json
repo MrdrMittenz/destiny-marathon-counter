@@ -1,0 +1,17 @@
+{
+  "name": "destiny-marathon-counter",
+  "version": "2.0.0",
+  "description": "Destiny 2 vs Marathon player count tracker with Destiny 2 analytics",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "setup-env": "powershell -Command \"if (-not (Test-Path .env)) { Copy-Item .env.example .env }\""
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.5",
+    "axios": "^1.7.7"
+  }
+}
