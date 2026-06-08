@@ -70,7 +70,7 @@ async function loadStreamers() {
 
     grid.innerHTML = data.streamers.map(channel => `
       <div class="streamer-card">
-        <iframe src="https://player.twitch.tv/?channel=${channel}&parent=${parent}&muted=true" allowfullscreen></iframe>
+        <iframe src="https://player.twitch.tv/?channel=${channel}&parent=${parent}&autoplay=false" allowfullscreen referrerpolicy="no-referrer"></iframe>
         <div class="info">
           <div>
             <span class="live-dot"></span>
