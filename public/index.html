@@ -67,6 +67,12 @@
     <div class="update-status" id="status">Connecting...</div>
   </div>
 
+  <div style="text-align:center;margin-bottom:16px;padding:12px;background:rgba(0,153,255,0.02);border:1px solid rgba(0,153,255,0.06);border-radius:12px">
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.2);margin-bottom:4px">Estimated Total Players (All Platforms)</div>
+    <div style="font-size:28px;font-weight:900;color:#fff" id="total-estimate">--</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:2px">PC <span id="total-pc">--</span> · PS5 <span id="total-ps">--</span> · Xbox <span id="total-xbox">--</span></div>
+  </div>
+
   <div class="counter-grid">
     <div class="card destiny">
       <div class="card-accent"></div>
@@ -221,6 +227,11 @@ async function fetchActivityEstimates() {
         <div style="font-size:9px;color:rgba(255,255,255,0.15);margin-top:2px">${Math.round(a.share * 100)}% of D2</div>
       </div>
     `).join('');
+
+    document.getElementById('total-estimate').textContent = fmt(data.platform.total);
+    document.getElementById('total-pc').textContent = fmt(data.platform.pc);
+    document.getElementById('total-ps').textContent = fmt(data.platform.ps5);
+    document.getElementById('total-xbox').textContent = fmt(data.platform.xbox);
   } catch (e) {}
 }
 

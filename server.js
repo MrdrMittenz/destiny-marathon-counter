@@ -61,10 +61,18 @@ const D2_TIMELINE = [
 
 const DATA_DIR = path.join(__dirname, 'data');
 const HISTORY_FILE = path.join(DATA_DIR, 'player-history.json');
+const GUESTBOOK_FILE = path.join(DATA_DIR, 'guestbook.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
 }
+
+let guestbook = [];
+function loadGuestbook() {
+  try { if (fs.existsSync(GUESTBOOK_FILE)) guestbook = JSON.parse(fs.readFileSync(GUESTBOOK_FILE, 'utf8')) || []; } catch { guestbook = []; }
+}
+function saveGuestbook() { try { fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(guestbook.slice(-200))); } catch {} }
+loadGuestbook();
 
 let currentPlayers = { destiny2: null, marathon: null, timestamp: null };
 let playerHistory = [];
@@ -491,6 +499,205 @@ app.get('/api/legacy/all', (req, res) => {
   });
 });
 
+const TOP_D2_STREAMERS = [
+  'Datto', 'Aztecross', 'Falloutplays', 'Gothalion', 'KackisHD',
+  'Ehroar', 'Mactics', 'Coolguy', 'CammyCakes', 'Frostbolt',
+  'SirDimetrious', 'Mtashed', 'Bakengansta', 'TheLegendofThunder',
+  'GernaderJake', 'Wallah', 'SayNoToRage', 'Zkmushroom', 'TrueVanguard',
+  'IamDavvv', 'LilSonic', 'Drewsky'
+];
+
+app.get('/api/destiny/weekly-featured', async (req, res) => {
+  try {
+    const milData = await fetchWithCache('/Destiny2/Milestones/', 120000);
+    const milestones = Object.values(milData.Response || {});
+    const featured = { raid: null, dungeon: null, activities: [] };
+
+    for (const ms of milestones) {
+      const name = ms.name || `Milestone ${ms.milestoneHash}`;
+      for (const a of (ms.activities || [])) {
+        try {
+          let actName = `Activity ${a.activityHash}`;
+          const def = await fetchWithCache(
+            `/Destiny2/Manifest/DestinyActivityDefinition/${a.activityHash}/`,
+            3600000
+          );
+          if (def.Response?.displayProperties?.name) actName = def.Response.displayProperties.name;
+          const lower = actName.toLowerCase();
+          const raidMatch = RAIDS.find(r => lower.includes(r.name.toLowerCase()));
+          const dungeonMatch = DUNGEONS.find(d => lower.includes(d.name.toLowerCase()));
+          if (raidMatch) featured.raid = raidMatch;
+          if (dungeonMatch) featured.dungeon = dungeonMatch;
+          featured.activities.push({ name: actName, hash: a.activityHash, milestone: name });
+        } catch {}
+      }
+    }
+    res.json(featured);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/countdown', (req, res) => {
+  const now = new Date();
+  const finalReset = new Date('2026-06-09T17:00:00Z');
+  const diffMs = Math.max(0, finalReset - now);
+  res.json({
+    now: now.toISOString(),
+    finalReset: finalReset.toISOString(),
+    days: Math.floor(diffMs / 86400000),
+    hours: Math.floor((diffMs % 86400000) / 3600000),
+    minutes: Math.floor((diffMs % 3600000) / 60000),
+    seconds: Math.floor((diffMs % 60000) / 1000),
+    isOver: diffMs <= 0
+  });
+});
+
+app.get('/api/guestbook', (req, res) => {
+  res.json({ entries: guestbook.slice().reverse(), total: guestbook.length });
+});
+
+app.post('/api/guestbook', (req, res) => {
+  const { name, message } = req.body;
+  if (!name || !message || name.length > 30 || message.length > 500) {
+    return res.status(400).json({ error: 'Name (max 30) and message (max 500) required' });
+  }
+  const entry = { id: Date.now(), name: name.trim(), message: message.trim(), time: Date.now() };
+  guestbook.push(entry);
+  saveGuestbook();
+  res.json({ success: true, entry });
+});
+
+app.get('/api/destiny/profile-stats/:membershipType/:membershipId', async (req, res) => {
+  try {
+    const { membershipType, membershipId } = req.params;
+    const components = '100,200,205,900,1000';
+    const data = await fetchWithCache(
+      `/Destiny2/${membershipType}/Profile/${membershipId}/?components=${components}`,
+      60000
+    );
+    const profile = data.Response?.profile?.data || {};
+    const characters = data.Response?.characters?.data || {};
+    const characterActivities = data.Response?.characterActivities?.data || {};
+    const profileProgression = data.Response?.profileProgression?.data || {};
+    const characterStats = data.Response?.characterStats?.data || {};
+
+    const titles = (profileProgression?.seasonalArtifact?.titlesUnlocked || []);
+    const triumphScore = profileProgression?.seasonalArtifact?.triumphScore || 0;
+
+    const allCharStats = { kills: 0, deaths: 0, assists: 0, activitiesCleared: 0, timePlayed: '0s' };
+    Object.values(characterStats).forEach(cs => {
+      const allTime = cs?.allTime || {};
+      allCharStats.kills += allTime.kills?.basic?.value || 0;
+      allCharStats.deaths += allTime.deaths?.basic?.value || 0;
+      allCharStats.assists += allTime.assists?.basic?.value || 0;
+      allCharStats.activitiesCleared += allTime.activitiesCleared?.basic?.value || 0;
+    });
+    const kd = allCharStats.deaths > 0 ? (allCharStats.kills / allCharStats.deaths).toFixed(2) : 'N/A';
+
+    const charSummaries = Object.entries(characters).map(([id, ch]) => ({
+      id,
+      classType: ch?.classType,
+      light: ch?.light || 0,
+      raceType: ch?.raceType,
+      genderType: ch?.genderType,
+      dateLastPlayed: ch?.dateLastPlayed
+    }));
+
+    res.json({
+      displayName: profile?.userInfo?.displayName || 'Guardian',
+      membershipType, membershipId,
+      characterCount: Object.keys(characters).length,
+      characters: charSummaries,
+      stats: { kd, kills: Math.round(allCharStats.kills), deaths: Math.round(allCharStats.deaths), assists: Math.round(allCharStats.assists), activitiesCleared: Math.round(allCharStats.activitiesCleared) },
+      triumphScore,
+      titles: profileProgression?.checklists || [],
+      dateLastPlayed: profile?.dateLastPlayed
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/destiny/profile-loadout/:membershipType/:membershipId/:characterId', async (req, res) => {
+  try {
+    const { membershipType, membershipId, characterId } = req.params;
+    const components = '200,201,205,300';
+    const data = await fetchWithCache(
+      `/Destiny2/${membershipType}/Profile/${membershipId}/?components=${components}`,
+      60000
+    );
+
+    const charData = data.Response?.characters?.data?.[characterId];
+    const equipment = data.Response?.characterEquipment?.data?.[characterId]?.items || [];
+    const activities = data.Response?.characterActivities?.data?.[characterId] || {};
+
+    const buckets = {
+      helmet: null, gauntlets: null, chest: null, legs: null, classItem: null,
+      kinetic: null, energy: null, power: null, ghost: null
+    };
+
+    const bucketTypeMap = {
+      3448274439: 'helmet', 3551919338: 'gauntlets', 14239492: 'chest',
+      20886954: 'legs', 1585787867: 'classItem',
+      1498876634: 'kinetic', 2465295065: 'energy', 953998645: 'power',
+      4023194814: 'ghost'
+    };
+
+    equipment.forEach(item => {
+      const bucket = bucketTypeMap[item.bucketHash];
+      if (bucket) buckets[bucket] = item;
+    });
+
+    const classNames = { 0: 'Titan', 1: 'Hunter', 2: 'Warlock' };
+
+    res.json({
+      character: charData ? {
+        classType: classNames[charData.classType] || 'Unknown',
+        light: charData.light || 0,
+        raceType: ['Human', 'Awoken', 'Exo'][charData.raceType] || 'Unknown',
+        emblemPath: charData.emblemPath
+      } : null,
+      equipment: buckets,
+      activities: activities.currentActivityHash || null,
+      availableActivities: (activities.availableActivities || []).slice(0, 10)
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/twitch/streams', async (req, res) => {
+  try {
+    const games = ['Destiny%202', 'Marathon'];
+    const allStreams = [];
+
+    for (const game of games) {
+      try {
+        const r = await axios.get(
+          `https://www.twitch.tv/directory/game/${game}`,
+          { timeout: 10000, headers: { 'Accept': 'text/html', 'User-Agent': 'Mozilla/5.0' } }
+        );
+      } catch {}
+    }
+
+    res.json({
+      streams: [],
+      note: 'Twitch API key needed for live stream data'
+    });
+  } catch (err) {
+    res.json({ streams: [], note: 'Twitch API key needed' });
+  }
+});
+
+app.get('/api/twitch/top-streamers', (req, res) => {
+  res.json({
+    streamers: TOP_D2_STREAMERS,
+    total: TOP_D2_STREAMERS.length,
+    embedUrl: 'https://player.twitch.tv/?channel=CHANNEL&parent=localhost&parent=destiny-marathon-counter.onrender.com'
+  });
+});
+
 app.get('/api/status', (req, res) => {
   res.json({
     bungieApiConfigured: !!BUNGIE_API_KEY,
@@ -510,6 +717,10 @@ app.get(['/analytics', '/analytics.html'], (req, res) => {
 
 app.get(['/legacy', '/legacy.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'legacy.html'));
+});
+
+app.get(['/streamers', '/streamers.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'streamers.html'));
 });
 
 app.get('*', (req, res) => {

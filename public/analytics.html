@@ -11,64 +11,55 @@
 .analytics-card.full { grid-column: 1 / -1; }
 .analytics-card h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
 .analytics-card .note { font-size: 11px; color: rgba(255,255,255,0.2); margin-top: 8px; line-height: 1.5; }
-
+.tabs { display: flex; gap: 2px; margin-bottom: 20px; background: rgba(255,255,255,0.02); border-radius: 10px; padding: 3px; flex-wrap: wrap; }
+.tab-btn { flex: 1; padding: 8px 12px; border: none; background: none; color: rgba(255,255,255,0.3); font-size: 10px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; border-radius: 8px; font-family: inherit; transition: all 0.2s; text-transform: uppercase; min-width:80px; }
+.tab-btn:hover { color: rgba(255,255,255,0.6); }
+.tab-btn.active { background: rgba(255,255,255,0.06); color: #fff; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
 .platform-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
 .platform-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; text-align: center; }
 .platform-box .plat-icon { font-size: 20px; margin-bottom: 4px; }
 .platform-box .plat-name { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.25); margin-bottom: 6px; }
 .platform-box .plat-count { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
-.platform-box .plat-pct { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 2px; }
-
 .activity-table { width: 100%; border-collapse: collapse; }
 .activity-table th { text-align: left; font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.2); padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); font-weight: 600; }
 .activity-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 13px; }
-.activity-table tr:last-child td { border-bottom: none; }
-.activity-table .act-name { font-weight: 500; }
 .activity-table .act-bar-cell { width: 40%; }
 .activity-table .act-bar-bg { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.04); overflow: hidden; }
 .activity-table .act-bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s; }
 .activity-table .act-count { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
 .activity-table .act-share { font-size: 10px; color: rgba(255,255,255,0.2); text-align: right; }
-
-.milestone-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-.milestone-name { font-size: 15px; font-weight: 600; color: #fff; }
-.milestone-date { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 2px; }
-.milestone-activities { margin-top: 8px; }
-.act-item { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 12px; color: rgba(255,255,255,0.5); }
-.act-item:last-child { border-bottom: none; }
-.act-dot { width: 4px; height: 4px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
-.act-dot.active { background: #22c55e; }
-.act-dot.inactive { background: rgba(255,255,255,0.15); }
-.badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
-.badge.active { background: rgba(34,197,94,0.15); color: #22c55e; }
-.badge.inactive { background: rgba(239,68,68,0.15); color: #ef4444; }
-
+.featured-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; margin-bottom: 12px; }
+.featured-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.2); }
+.featured-card .name { font-size: 16px; font-weight: 700; margin-top: 2px; }
+.featured-card .links { margin-top: 6px; display: flex; gap: 8px; }
+.featured-card .links a { font-size: 10px; padding: 3px 10px; border-radius: 4px; text-decoration: none; color: #0099ff; background: rgba(0,153,255,0.08); }
+.featured-card .icon { font-size: 32px; opacity: 0.3; }
 .player-search-section { margin-bottom: 24px; }
 .search-box { display: flex; gap: 8px; max-width: 500px; margin: 0 auto; }
 .search-box input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 14px; color: #fff; font-size: 13px; font-family: inherit; outline: none; }
 .search-box input:focus { border-color: rgba(0,153,255,0.4); }
-.search-box input::placeholder { color: rgba(255,255,255,0.2); }
 .search-box button { background: rgba(0,153,255,0.15); border: 1px solid rgba(0,153,255,0.2); color: #0099ff; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; letter-spacing: 1px; }
 .search-box button:hover { background: rgba(0,153,255,0.25); }
-
 .profile-result { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 24px; margin-top: 16px; display: none; }
 .profile-result .characters { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
-.profile-result .character { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; text-align: center; }
+.profile-result .character { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+.profile-result .character:hover { border-color: rgba(0,153,255,0.2); }
 .profile-result .character .class-name { font-size: 12px; font-weight: 600; }
 .profile-result .character .class-light { font-size: 10px; color: rgba(255,255,255,0.3); }
-
-.tabs { display: flex; gap: 2px; margin-bottom: 20px; background: rgba(255,255,255,0.02); border-radius: 10px; padding: 3px; }
-.tab-btn { flex: 1; padding: 8px 16px; border: none; background: none; color: rgba(255,255,255,0.3); font-size: 11px; font-weight: 600; letter-spacing: 1px; cursor: pointer; border-radius: 8px; font-family: inherit; transition: all 0.2s; text-transform: uppercase; }
-.tab-btn:hover { color: rgba(255,255,255,0.6); }
-.tab-btn.active { background: rgba(255,255,255,0.06); color: #fff; }
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin: 12px 0; }
+.stat-chip { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; text-align: center; }
+.stat-chip .chip-val { font-size: 16px; font-weight: 700; color: #0099ff; }
+.stat-chip .chip-label { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.2); margin-top: 2px; }
+.loadout-display { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.loadout-slot { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); border-radius: 6px; padding: 8px; text-align: center; font-size: 10px; color: rgba(255,255,255,0.3); }
+.loadout-slot .slot-name { font-size: 8px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.15); }
 @media (max-width: 640px) {
   .analytics-grid { grid-template-columns: 1fr; }
-  .platform-row { grid-template-columns: 1fr; }
-  .profile-result .characters { grid-template-columns: 1fr; }
+  .platform-row, .stats-row, .profile-result .characters { grid-template-columns: 1fr; }
   .activity-table .act-bar-cell { display: none; }
+  .featured-card { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
@@ -82,19 +73,15 @@
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('estimates')">Activity Estimates</button>
+    <button class="tab-btn active" onclick="switchTab('estimates')">Estimates</button>
+    <button class="tab-btn" onclick="switchTab('featured')">Featured</button>
     <button class="tab-btn" onclick="switchTab('milestones')">Milestones</button>
     <button class="tab-btn" onclick="switchTab('search')">Player Search</button>
   </div>
 
-  <div id="tab-estimates" class="tab-content active">
-    <div id="estimatesContent"><div class="loading">Loading estimates...</div></div>
-  </div>
-
-  <div id="tab-milestones" class="tab-content">
-    <div id="milestonesContent"><div class="loading">Loading milestones...</div></div>
-  </div>
-
+  <div id="tab-estimates" class="tab-content active"><div id="estimatesContent"><div class="loading">Loading...</div></div></div>
+  <div id="tab-featured" class="tab-content"><div id="featuredContent"><div class="loading">Loading weekly featured...</div></div></div>
+  <div id="tab-milestones" class="tab-content"><div id="milestonesContent"><div class="loading">Loading milestones...</div></div></div>
   <div id="tab-search" class="tab-content">
     <div class="player-search-section">
       <div class="search-box">
@@ -102,239 +89,171 @@
         <button onclick="searchPlayer()">Search</button>
       </div>
       <div id="profileResult" class="profile-result"></div>
+      <div id="loadoutResult" style="display:none" class="profile-result"></div>
     </div>
   </div>
 
   <div class="nav-links">
     <a href="/">← Live Counter</a>
     <a href="/trends">Trends & Charts</a>
-    <a href="/legacy" style="border-color:rgba(0,153,255,0.2);color:#0099ff">🏛️ Destiny Legacy</a>
+    <a href="/streamers">🎥 Streamers</a>
+    <a href="/legacy" style="border-color:rgba(0,153,255,0.2);color:#0099ff">🏛️ Legacy</a>
   </div>
-
-  <div class="footer">Steam data refreshes every 15s • Bungie API cached 2min</div>
+  <div class="footer">Steam 15s · Bungie API 2min</div>
 </div>
 
 <script>
 const statusEl = document.getElementById('status');
-let estimatesData = null;
-
 function fmt(n) { return (n ?? 0).toLocaleString(); }
-
 function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(name)));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().trim() === name));
   document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
 }
 
+// ---- Estimates ----
 async function fetchEstimates() {
   try {
     const r = await fetch('/api/destiny/activity-estimates');
-    const data = await r.json();
-    estimatesData = data;
-    renderEstimates(data);
-    statusEl.textContent = 'Live • ' + data.d2Steam.toLocaleString() + ' D2 Steam players';
+    const d = await r.json();
+    if (!d.activities) return;
+    const colors = { raid:'#ff6b6b',dungeon:'#845ef7',nightfall:'#ff922b',strike:'#20c997',crucible:'#339af0',trials:'#fcc419',ironbanner:'#ff6b00',gambit:'#cc5de8',seasonal:'#51cf66',openworld:'#748ffc' };
+    const max = Math.max(...d.activities.map(a=>a.estimatedPlayers), 1);
+    document.getElementById('estimatesContent').innerHTML = `
+      <div class="analytics-card full" style="margin-bottom:16px">
+        <h3>Platform Estimates</h3>
+        <div class="platform-row">
+          <div class="platform-box" style="border-color:rgba(0,153,255,0.15)"><div class="plat-icon">🖥️</div><div class="plat-name">PC Steam</div><div class="plat-count" style="color:#0099ff">${fmt(d.platform.pc)}</div><div class="plat-pct">Actual</div></div>
+          <div class="platform-box" style="border-color:rgba(34,197,94,0.15)"><div class="plat-icon">🎮</div><div class="plat-name">PS5</div><div class="plat-count" style="color:#22c55e">${fmt(d.platform.ps5)}</div><div class="plat-pct">~45% estimate</div></div>
+          <div class="platform-box" style="border-color:rgba(34,197,94,0.15)"><div class="plat-icon">🟢</div><div class="plat-name">Xbox</div><div class="plat-count" style="color:#22c55e">${fmt(d.platform.xbox)}</div><div class="plat-pct">~20% estimate</div></div>
+        </div>
+        <div class="note">Platform split estimated via Destiny 2 historical ratio.</div>
+      </div>
+      <div class="analytics-card full">
+        <h3>Activity Population Estimates (${fmt(d.d2Steam)} total D2 Steam)</h3>
+        <table class="activity-table"><thead><tr><th style="width:30%">Activity</th><th class="act-bar-cell"></th><th style="text-align:right;width:15%">Players</th><th style="text-align:right;width:10%">Share</th></tr></thead><tbody>
+        ${d.activities.map(a => `<tr><td class="act-name">${a.label}</td><td class="act-bar-cell"><div class="act-bar-bg"><div class="act-bar-fill" style="width:${Math.round(a.estimatedPlayers/max*100)}%;background:${colors[a.type]||'#555'}"></div></div></td><td class="act-count">${fmt(a.estimatedPlayers)}</td><td class="act-share">${Math.round(a.share*100)}%</td></tr>`).join('')}
+        </tbody></table>
+        <div class="note">Based on typical engagement patterns. Estimates only.</div>
+      </div>`;
+    statusEl.textContent = d.d2Steam.toLocaleString() + ' D2 players';
     statusEl.className = 'update-status live';
-  } catch (err) {
-    document.getElementById('estimatesContent').innerHTML = '<div class="error-msg">' + err.message + '</div>';
-  }
+  } catch(e) { document.getElementById('estimatesContent').innerHTML = '<div class="error-msg">'+e.message+'</div>'; }
 }
 
-function renderEstimates(data) {
-  const colors = {
-    raid: '#ff6b6b', dungeon: '#845ef7', nightfall: '#ff922b',
-    strike: '#20c997', crucible: '#339af0', trials: '#fcc419',
-    ironbanner: '#ff6b00', gambit: '#cc5de8', seasonal: '#51cf66',
-    openworld: '#748ffc'
-  };
-
-  const maxPlayers = Math.max(...data.activities.map(a => a.estimatedPlayers), 1);
-  const totalActive = data.activities.reduce((s, a) => s + a.estimatedPlayers, 0);
-
-  let tableRows = data.activities.map(a => {
-    const pct = Math.round(a.estimatedPlayers / maxPlayers * 100);
-    const sharePct = Math.round(a.share * 100);
-    return `
-      <tr>
-        <td class="act-name">${a.label}</td>
-        <td class="act-bar-cell">
-          <div class="act-bar-bg">
-            <div class="act-bar-fill" style="width:${pct}%;background:${colors[a.type] || '#555'}"></div>
-          </div>
-        </td>
-        <td class="act-count">${fmt(a.estimatedPlayers)}</td>
-        <td class="act-share">${sharePct}%</td>
-      </tr>
-    `;
-  }).join('');
-
-  document.getElementById('estimatesContent').innerHTML = `
-    <div class="analytics-card full" style="margin-bottom:16px">
-      <h3>Platform Split Estimates</h3>
-      <div class="platform-row">
-        <div class="platform-box" style="border-color:rgba(0,153,255,0.15)">
-          <div class="plat-icon">🖥️</div>
-          <div class="plat-name">PC (Steam)</div>
-          <div class="plat-count" style="color:#0099ff">${fmt(data.platform.pc)}</div>
-          <div class="plat-pct">Actual concurrent</div>
-        </div>
-        <div class="platform-box" style="border-color:rgba(0,200,83,0.15)">
-          <div class="plat-icon">🎮</div>
-          <div class="plat-name">PlayStation 5</div>
-          <div class="plat-count" style="color:#22c55e">${fmt(data.platform.ps5)}</div>
-          <div class="plat-pct">~${data.d2PlatformShare + 10}% estimate</div>
-        </div>
-        <div class="platform-box" style="border-color:rgba(0,200,83,0.15)">
-          <div class="plat-icon">🟢</div>
-          <div class="plat-name">Xbox Series X|S</div>
-          <div class="plat-count" style="color:#22c55e">${fmt(data.platform.xbox)}</div>
-          <div class="plat-pct">~${Math.round(data.d2PlatformShare - 15)}% estimate</div>
-        </div>
-      </div>
-      <div class="note">Platform estimates use Destiny 2's historical split (~35% PC, ~45% PS, ~20% Xbox). Bungie does not publish console player counts.</div>
-    </div>
-
-    <div class="analytics-card full">
-      <h3>Activity Population Estimates</h3>
-      <div style="margin-bottom:12px;font-size:11px;color:rgba(255,255,255,0.2)">
-        Based on <strong style="color:#fff">${fmt(data.d2Steam)}</strong> current Steam D2 players
-        ${data.activities.length > 0 ? `· Detected ${data.activities.length} active activity types` : ''}
-      </div>
-      <table class="activity-table">
-        <thead>
-          <tr>
-            <th style="width:30%">Activity</th>
-            <th class="act-bar-cell"></th>
-            <th style="text-align:right;width:15%">Players</th>
-            <th style="text-align:right;width:10%">Share</th>
-          </tr>
-        </thead>
-        <tbody>${tableRows}</tbody>
-      </table>
-      <div class="note" style="margin-top:12px">
-        <strong>Estimates only.</strong> Activity population breakdown based on typical engagement patterns and active milestones.
-        Actual numbers vary by time of day, day of week, and current event schedule.
-        Data refreshes with each Steam update (~15s).
-      </div>
-    </div>
-  `;
-}
-
-async function searchPlayer() {
-  const name = document.getElementById('playerSearch').value.trim();
-  if (!name) return;
-  const parts = name.split('#');
-  if (parts.length !== 2) {
-    document.getElementById('profileResult').style.display = 'block';
-    document.getElementById('profileResult').innerHTML = '<div style="text-align:center;color:#ef4444;font-size:12px">Use format: Name#1234</div>';
-    return;
-  }
-  const el = document.getElementById('profileResult');
-  el.style.display = 'block';
-  el.innerHTML = '<div class="loading">Searching...</div>';
-
+// ---- Featured ----
+async function fetchFeatured() {
   try {
-    const r = await fetch(`/api/destiny/search-player/${encodeURIComponent(parts[0])}/${encodeURIComponent(parts[1])}`);
-    const data = await r.json();
-    if (data.error) { el.innerHTML = `<div style="text-align:center;color:#ef4444;font-size:12px">${data.error}</div>`; return; }
-    renderProfile(data);
-  } catch(err) {
-    el.innerHTML = `<div style="text-align:center;color:#ef4444;font-size:12px">Search failed: ${err.message}</div>`;
-  }
+    const r = await fetch('/api/destiny/weekly-featured');
+    const d = await r.json();
+    let html = '<div class="analytics-card full"><h3>This Week\'s Featured Activities</h3>';
+    if (d.raid) html += `<div class="featured-card" style="border-left:3px solid #ff6b6b"><div class="icon">🏛️</div><div><div class="label">Featured Raid</div><div class="name">${d.raid.name}</div><div class="links"><a href="${d.raid.guideUrl}" target="_blank">📺 Guide</a><a href="${d.raid.reportUrl}" target="_blank">📊 Stats</a></div></div></div>`;
+    if (d.dungeon) html += `<div class="featured-card" style="border-left:3px solid #845ef7"><div class="icon">⚔️</div><div><div class="label">Featured Dungeon</div><div class="name">${d.dungeon.name}</div><div class="links"><a href="${d.dungeon.guideUrl}" target="_blank">📺 Guide</a><a href="${d.dungeon.reportUrl}" target="_blank">📊 Stats</a></div></div></div>`;
+    if (!d.raid && !d.dungeon) html += '<div class="note">No featured raid or dungeon detected this week.</div>';
+    if (d.activities.length) html += `<div style="margin-top:12px"><div class="section-title">All Active Activities (${d.activities.length})</div>` + d.activities.slice(0,15).map(a => `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);font-size:11px;color:rgba(255,255,255,0.4)"><span>${a.name}</span><span style="color:rgba(255,255,255,0.2);font-size:10px">${a.milestone}</span></div>`).join('') + '</div>';
+    html += '</div>';
+    document.getElementById('featuredContent').innerHTML = html;
+  } catch(e) { document.getElementById('featuredContent').innerHTML = '<div class="error-msg">'+e.message+'</div>'; }
 }
 
-function renderProfile(data) {
-  const profile = data.profile?.Response?.profile?.data;
-  const characters = data.characters?.Response?.data || {};
-  const player = data.player || {};
-  const display = player.bungieGlobalDisplayName
-    ? player.bungieGlobalDisplayName + '#' + player.bungieGlobalDisplayNameCode
-    : player.displayName || 'Guardian';
-
-  let html = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <div>
-        <div style="font-size:16px;font-weight:600">${display}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.3)">${profile?.characterIds?.length || 0} characters</div>
-      </div>
-    </div>
-    <div class="characters">
-  `;
-  const classNames = { 0: 'Titan', 1: 'Hunter', 2: 'Warlock' };
-  const raceNames = { 0: 'Human', 1: 'Awoken', 2: 'Exo' };
-  Object.entries(characters).forEach(([id, char]) => {
-    html += `
-      <div class="character">
-        <div style="font-size:24px;margin-bottom:4px">${char.data?.classType === 0 ? '🛡️' : char.data?.classType === 1 ? '🗡️' : '🔮'}</div>
-        <div class="class-name">${classNames[char.data?.classType] || 'Unknown'}</div>
-        <div class="class-light">Power ${char.data?.light || '--'} · ${raceNames[char.data?.raceType] || ''}</div>
-      </div>
-    `;
-  });
-  html += '</div>';
-  if (profile?.dateLastPlayed) {
-    html += `<div class="note" style="text-align:center;margin-top:12px">Last played: ${new Date(profile.dateLastPlayed).toLocaleDateString()}</div>`;
-  }
-  document.getElementById('profileResult').innerHTML = html;
-}
-
+// ---- Milestones ----
 async function renderMilestones() {
   try {
     const r = await fetch('/api/destiny/milestones');
-    const data = await r.json();
-    if (!data?.Response) {
-      document.getElementById('milestonesContent').innerHTML = '<div class="error-msg">No milestones available</div>';
-      return;
-    }
-    const milestones = Object.values(data.Response);
-    if (!milestones.length) {
-      document.getElementById('milestonesContent').innerHTML = '<div class="analytics-card full"><h3>No Active Milestones</h3><div class="note">Check back after weekly reset</div></div>';
-      return;
-    }
-    let html = '<div class="analytics-grid">';
-    milestones.forEach(m => {
+    const d = await r.json();
+    if (!d?.Response) { document.getElementById('milestonesContent').innerHTML = '<div class="error-msg">No milestones</div>'; return; }
+    const ms = Object.values(d.Response);
+    if (!ms.length) { document.getElementById('milestonesContent').innerHTML = '<div class="analytics-card full"><h3>No Active Milestones</h3></div>'; return; }
+    document.getElementById('milestonesContent').innerHTML = '<div class="analytics-grid">' + ms.map(m => {
       const now = new Date();
       const start = m.startDate ? new Date(m.startDate) : null;
       const end = m.endDate ? new Date(m.endDate) : null;
       const isActive = start && now >= start && (!end || now <= end);
-      const acts = m.activities || [];
-      html += `
-        <div class="analytics-card">
-          <div class="milestone-header">
-            <div>
-              <div class="milestone-name">${m.name || 'Weekly'}</div>
-              ${m.startDate ? `<div class="milestone-date">${new Date(m.startDate).toLocaleDateString()}${m.endDate ? ' - ' + new Date(m.endDate).toLocaleDateString() : ''}</div>` : ''}
-            </div>
-            <span class="badge ${isActive ? 'active' : 'inactive'}">${isActive ? 'Active' : 'Expired'}</span>
-          </div>
-          <div class="milestone-activities">
-            ${acts.slice(0, 8).map(a => `<div class="act-item"><span class="act-dot ${isActive ? 'active' : 'inactive'}"></span>${a.name || 'Activity ' + a.activityHash}</div>`).join('')}
-            ${acts.length === 0 ? '<div style="font-size:11px;color:rgba(255,255,255,0.15)">No activity details</div>' : ''}
-          </div>
-        </div>
-      `;
-    });
-    html += '</div>';
-    document.getElementById('milestonesContent').innerHTML = html;
-  } catch(err) {
-    document.getElementById('milestonesContent').innerHTML = '<div class="error-msg">' + err.message + '</div>';
-  }
+      return `<div class="analytics-card"><div class="milestone-header"><div><div class="milestone-name">${m.name||'Weekly'}</div>${m.startDate?`<div class="milestone-date">${new Date(m.startDate).toLocaleDateString()}${m.endDate?' - '+new Date(m.endDate).toLocaleDateString():''}</div>`:''}</div><span class="badge ${isActive?'active':'inactive'}">${isActive?'Active':'Expired'}</span></div><div class="milestone-activities">${(m.activities||[]).slice(0,8).map(a=>`<div class="act-item"><span class="act-dot ${isActive?'active':'inactive'}"></span>${a.name||'Activity '+a.activityHash}</div>`).join('')}${(m.activities||[]).length===0?'<div style="font-size:11px;color:rgba(255,255,255,0.15)">No details</div>':''}</div></div>`;
+    }).join('') + '</div>';
+  } catch(e) { document.getElementById('milestonesContent').innerHTML = '<div class="error-msg">'+e.message+'</div>'; }
 }
 
-async function checkStatus() {
-  try { const r = await fetch('/api/status'); const d = await r.json(); return d.bungieApiConfigured; }
-  catch { return false; }
+// ---- Player Search ----
+async function searchPlayer() {
+  const name = document.getElementById('playerSearch').value.trim();
+  if (!name || !name.includes('#')) { document.getElementById('profileResult').style.display='block'; document.getElementById('profileResult').innerHTML='<div style="text-align:center;color:#ef4444;font-size:12px">Use format: Name#1234</div>'; return; }
+  const [un, code] = name.split('#');
+  const pr = document.getElementById('profileResult'); pr.style.display='block'; pr.innerHTML='<div class="loading">Searching...</div>';
+  document.getElementById('loadoutResult').style.display='none';
+  try {
+    const r = await fetch(`/api/destiny/search-player/${encodeURIComponent(un)}/${encodeURIComponent(code)}`);
+    const data = await r.json();
+    if (data.error) { pr.innerHTML=`<div style="text-align:center;color:#ef4444;font-size:12px">${data.error}</div>`; return; }
+
+    let html = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><div style="font-size:16px;font-weight:600">${data.player?.bungieGlobalDisplayName||'Guardian'}#${data.player?.bungieGlobalDisplayNameCode||''}</div><div style="font-size:11px;color:rgba(255,255,255,0.3);cursor:pointer" onclick="fetchFullStats(${data.player?.membershipType},'${data.player?.membershipId}')">📊 Load full stats →</div></div></div>`;
+
+    const chars = data.characters?.Response?.data || {};
+    const classNames = {0:'Titan',1:'Hunter',2:'Warlock'};
+    const raceNames = {0:'Human',1:'Awoken',2:'Exo'};
+    html += '<div class="characters">';
+    Object.entries(chars).forEach(([id,ch]) => {
+      html += `<div class="character" onclick="fetchLoadout(${data.player.membershipType},'${data.player.membershipId}','${id}')">
+        <div style="font-size:24px;margin-bottom:4px">${ch.data?.classType===0?'🛡️':ch.data?.classType===1?'🗡️':'🔮'}</div>
+        <div class="class-name">${classNames[ch.data?.classType]||'?'}</div>
+        <div class="class-light">Power ${ch.data?.light||'--'} · ${raceNames[ch.data?.raceType]||''}</div>
+        <div style="font-size:8px;color:rgba(0,153,255,0.4);margin-top:4px">Click for loadout</div>
+      </div>`;
+    });
+    html += '</div>';
+    pr.innerHTML = html;
+  } catch(e) { pr.innerHTML = '<div style="text-align:center;color:#ef4444;font-size:12px">'+e.message+'</div>'; }
+}
+
+async function fetchFullStats(mt, mid) {
+  const pr = document.getElementById('profileResult');
+  try {
+    const r = await fetch(`/api/destiny/profile-stats/${mt}/${mid}`);
+    const d = await r.json();
+    if (d.error) return;
+    const extra = document.createElement('div');
+    extra.innerHTML = `
+      <div class="stats-row">
+        <div class="stat-chip"><div class="chip-val">${d.stats.kd}</div><div class="chip-label">KD</div></div>
+        <div class="stat-chip"><div class="chip-val">${fmt(d.stats.kills)}</div><div class="chip-label">Kills</div></div>
+        <div class="stat-chip"><div class="chip-val">${fmt(d.stats.deaths)}</div><div class="chip-label">Deaths</div></div>
+        <div class="stat-chip"><div class="chip-val">${fmt(d.stats.activitiesCleared)}</div><div class="chip-label">Activities</div></div>
+        <div class="stat-chip"><div class="chip-val">${fmt(d.triumphScore||0)}</div><div class="chip-label">Triumph Score</div></div>
+      </div>
+    `;
+    pr.appendChild(extra);
+  } catch(e) {}
+}
+
+async function fetchLoadout(mt, mid, cid) {
+  const lr = document.getElementById('loadoutResult');
+  lr.style.display='block';
+  lr.innerHTML = '<div class="loading">Loading loadout...</div>';
+  try {
+    const r = await fetch(`/api/destiny/profile-loadout/${mt}/${mid}/${cid}`);
+    const d = await r.json();
+    if (d.error) { lr.innerHTML='<div class="error-msg">'+d.error+'</div>'; return; }
+    const slotNames = {helmet:'Helmet',gauntlets:'Gauntlets',chest:'Chest',legs:'Legs',classItem:'Class Item',kinetic:'Kinetic',energy:'Energy',power:'Power',ghost:'Ghost'};
+    const classEmoji = {'Titan':'🛡️','Hunter':'🗡️','Warlock':'🔮'};
+    let html = `<div style="display:flex;justify-content:space-between;margin-bottom:8px"><div style="font-size:14px;font-weight:600">${classEmoji[d.character?.classType]||''} ${d.character?.classType||'?'} · Power ${d.character?.light||'?'}</div></div><div class="loadout-display">`;
+    Object.entries(d.equipment||{}).forEach(([slot,item]) => {
+      html += `<div class="loadout-slot"><div class="slot-name">${slotNames[slot]||slot}</div>${item ? '<div style="margin-top:4px;font-size:9px;color:rgba(255,255,255,0.4)">Item #'+item.itemHash+'</div>' : '<div style="margin-top:4px;font-size:9px;color:rgba(255,255,255,0.15)">Empty</div>'}</div>`;
+    });
+    html += '</div>';
+    if (d.availableActivities?.length) {
+      html += `<div style="margin-top:12px;font-size:10px;color:rgba(255,255,255,0.2)">Available: ${d.availableActivities.map(a=>a.activityHash||'?').join(', ')}</div>`;
+    }
+    lr.innerHTML = html;
+  } catch(e) { lr.innerHTML = '<div class="error-msg">'+e.message+'</div>'; }
 }
 
 async function init() {
-  const configured = await checkStatus();
-  if (!configured) {
-    const msg = '<div class="analytics-card full" style="text-align:center;padding:60px"><h3>Bungie API Key Required</h3><p style="font-size:13px;color:rgba(255,255,255,0.3);margin:12px 0">Create a Bungie developer app at <a href="https://www.bungie.net/en/Application" target="_blank" style="color:#0099ff">bungie.net/en/Application</a> and add the API key to .env</p></div>';
-    ['estimatesContent','milestonesContent'].forEach(id => document.getElementById(id).innerHTML = msg);
+  try { const r=await fetch('/api/status'); const d=await r.json(); if(!d.bungieApiConfigured) throw 'no key'; } catch {
+    const msg='<div class="analytics-card full" style="text-align:center;padding:60px"><h3>Bungie API Key Required</h3><p style="font-size:13px;color:rgba(255,255,255,0.3);margin:12px 0">Create at <a href="https://www.bungie.net/en/Application" target="_blank" style="color:#0099ff">bungie.net/en/Application</a></p></div>';
+    ['estimatesContent','featuredContent','milestonesContent'].forEach(id=>document.getElementById(id).innerHTML=msg);
     return;
   }
-  fetchEstimates();
-  renderMilestones();
+  fetchEstimates(); fetchFeatured(); renderMilestones();
 }
-
 init();
 setInterval(fetchEstimates, 30000);
 </script>
