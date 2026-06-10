@@ -63,6 +63,7 @@ const D2_TIMELINE = [
 const DATA_DIR = path.join(__dirname, 'data');
 const HISTORY_FILE = path.join(DATA_DIR, 'player-history.json');
 const GUESTBOOK_FILE = path.join(DATA_DIR, 'guestbook.json');
+const VIEWS_FILE = path.join(DATA_DIR, 'views.json');
 
 if (!fs.existsSync(DATA_DIR)) {
   fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -74,6 +75,37 @@ function loadGuestbook() {
 }
 function saveGuestbook() { try { fs.writeFileSync(GUESTBOOK_FILE, JSON.stringify(guestbook.slice(-200))); } catch {} }
 loadGuestbook();
+
+let viewData = { total: 0, todayTotal: 0, todayDate: '', paths: {}, daily: {}, lastReset: null };
+function loadViews() {
+  try {
+    if (fs.existsSync(VIEWS_FILE)) {
+      viewData = JSON.parse(fs.readFileSync(VIEWS_FILE, 'utf8'));
+      if (typeof viewData.total !== 'number') viewData.total = 0;
+      if (typeof viewData.todayTotal !== 'number') viewData.todayTotal = 0;
+      if (!viewData.paths || typeof viewData.paths !== 'object') viewData.paths = {};
+      if (!viewData.daily || typeof viewData.daily !== 'object') viewData.daily = {};
+    }
+  } catch { viewData = { total: 0, todayTotal: 0, todayDate: '', paths: {}, daily: {}, lastReset: null }; }
+}
+function saveViews() {
+  try { fs.writeFileSync(VIEWS_FILE, JSON.stringify(viewData)); } catch {}
+}
+loadViews();
+
+function trackView(reqPath) {
+  const today = new Date().toISOString().slice(0, 10);
+  if (viewData.todayDate !== today) {
+    viewData.todayDate = today;
+    viewData.todayTotal = 0;
+  }
+  viewData.total++;
+  viewData.todayTotal++;
+  viewData.paths[reqPath] = (viewData.paths[reqPath] || 0) + 1;
+  viewData.daily[today] = (viewData.daily[today] || 0) + 1;
+  viewData.lastReset = null;
+  saveViews();
+}
 
 let currentPlayers = { destiny2: null, marathon: null, timestamp: null };
 let playerHistory = [];
@@ -109,6 +141,14 @@ console.log(`Loaded ${playerHistory.length} historical data points`);
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+    const p = req.path === '/' ? '/' : req.path.replace(/\.html$/, '');
+    trackView(p);
+  }
+  next();
+});
 
 async function fetchSteamPlayerCount(appId) {
   const url = `https://api.steampowered.com/ISteamUserStats/GetNumberOfCurrentPlayers/v1/?appid=${appId}`;
@@ -749,6 +789,25 @@ app.get('/api/twitch/top-streamers', async (req, res) => {
       liveCount: 0
     });
   }
+});
+
+app.get('/api/views', (req, res) => {
+  const topPaths = Object.entries(viewData.paths).sort((a, b) => b[1] - a[1]).slice(0, 20);
+  const last30 = {};
+  const today = new Date().toISOString().slice(0, 10);
+  for (let i = 0; i < 30; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().slice(0, 10);
+    last30[key] = viewData.daily[key] || 0;
+  }
+  res.json({
+    total: viewData.total,
+    todayTotal: viewData.todayTotal,
+    todayDate: viewData.todayDate,
+    topPaths,
+    daily: last30
+  });
 });
 
 app.get('/api/status', (req, res) => {

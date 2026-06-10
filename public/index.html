@@ -147,7 +147,7 @@
     <a href="/legacy" style="border-color:rgba(0,153,255,0.2);color:#0099ff">🏛️ Destiny Legacy</a>
   </div>
 
-  <div class="footer">Data from Steam API — refreshes every 15s</div>
+  <div class="footer">Data from Steam API — refreshes every 15s — <span id="viewCount">0</span> page views</div>
 </div>
 
 <script>
@@ -249,9 +249,19 @@ async function fetchActivityEstimates() {
   } catch (e) {}
 }
 
+async function fetchViews() {
+  try {
+    const r = await fetch('/api/views');
+    const d = await r.json();
+    document.getElementById('viewCount').textContent = d.total.toLocaleString();
+  } catch {}
+}
+
 fetchAll();
+fetchViews();
 fetchActivityEstimates();
 setInterval(fetchAll, 15000);
+setInterval(fetchViews, 60000);
 setInterval(fetchActivityEstimates, 30000);
 </script>
 </body>
