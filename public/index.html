@@ -291,6 +291,46 @@ body {
   transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.platform-breakdown {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.platform-breakdown span {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.platform-breakdown .ps5 { color: #003087; }
+.platform-breakdown .xbox { color: #107c10; }
+.platform-breakdown .pc { color: #0099ff; }
+
+.est-total {
+  margin-top: 12px;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: rgba(255,255,255,0.6);
+}
+
+.est-total-label {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.15);
+  margin-top: 2px;
+}
+
+.card.marathon .platform-breakdown { justify-content: flex-start; }
+.card.destiny { text-align: right; }
+
 .footer {
   text-align: center;
   margin-top: 24px;
@@ -374,6 +414,8 @@ body {
       <div class="game-name">Marathon</div>
       <div class="player-count" id="mara-count">--</div>
       <div class="count-label">Current Players</div>
+      <div class="platform-breakdown" id="mara-breakdown"></div>
+      <div class="est-total" id="mara-total"></div>
     </div>
   </div>
 
@@ -382,13 +424,21 @@ body {
     <div class="total-bar-mara" id="bar-mara" style="width: 50%"></div>
   </div>
 
-  <div class="footer">Data from Steam API &mdash; refreshes every 15s</div>
+  <div class="footer">Marathon console counts estimated from PC ratio &mdash; refreshes every 15s</div>
 </div>
 
 <script>
 const D2_APPID = 1085660;
 const MARA_APPID = 3065800;
 const REFRESH_MS = 15000;
+
+const RATIO_PC = 126333;
+const RATIO_PS5 = 162428;
+const RATIO_XBOX = 72190;
+const RATIO_TOTAL = RATIO_PC + RATIO_PS5 + RATIO_XBOX;
+const RATIO_MULT_PS5 = RATIO_PS5 / RATIO_PC;
+const RATIO_MULT_XBOX = RATIO_XBOX / RATIO_PC;
+const RATIO_MULT_TOTAL = RATIO_TOTAL / RATIO_PC;
 
 const d2El = document.getElementById('d2-count');
 const maraEl = document.getElementById('mara-count');
@@ -397,6 +447,8 @@ const diffFill = document.getElementById('diff-fill');
 const diffText = document.getElementById('diff-text');
 const barD2 = document.getElementById('bar-d2');
 const barMara = document.getElementById('bar-mara');
+const maraBreakdown = document.getElementById('mara-breakdown');
+const maraTotal = document.getElementById('mara-total');
 
 let prevD2 = null;
 let prevMara = null;
@@ -467,8 +519,20 @@ async function fetchPlayers() {
 
     animateCount(d2El, d2, prevD2);
     animateCount(maraEl, mara, prevMara);
-    updateBar(d2, mara);
-    updateDiff(d2, mara);
+
+    const estPs5 = Math.round(mara * RATIO_MULT_PS5);
+    const estXbox = Math.round(mara * RATIO_MULT_XBOX);
+    const estTotal = Math.round(mara * RATIO_MULT_TOTAL);
+
+    maraBreakdown.innerHTML = `
+      <span class="pc">Steam ${formatNum(mara)}</span>
+      <span class="ps5">PS5 ${formatNum(estPs5)}</span>
+      <span class="xbox">Xbox ${formatNum(estXbox)}</span>
+    `;
+    maraTotal.innerHTML = `${formatNum(estTotal)} <span class="est-total-label">Estimated Total</span>`;
+
+    updateBar(d2, estTotal);
+    updateDiff(d2, estTotal);
 
     prevD2 = d2;
     prevMara = mara;
