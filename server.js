@@ -459,6 +459,10 @@ app.get('/api/destiny/activity-estimates', async (req, res) => {
     const d2Only = currentPlayers.destiny2 || 0;
     const mareOnly = currentPlayers.marathon || 0;
 
+    const estMaraTotal = Math.round(mareOnly / 0.35);
+    const estMaraPS = Math.round(estMaraTotal * 0.45);
+    const estMaraXbox = Math.round(estMaraTotal * 0.20);
+
     let activityBreakdown = estimateActivityPopulation(d2Only);
 
     try {
@@ -505,6 +509,13 @@ app.get('/api/destiny/activity-estimates', async (req, res) => {
       platform: platformEstimate,
       d2Steam: d2Only,
       marathonSteam: mareOnly,
+      marathonPlatform: {
+        pc: mareOnly,
+        ps5: estMaraPS,
+        xbox: estMaraXbox,
+        total: estMaraTotal,
+        note: 'Platform split estimated using Destiny 2 historical ratio (PC ~35%, PS ~45%, Xbox ~20%)'
+      },
       activities: activityBreakdown.sort((a, b) => b.estimatedPlayers - a.estimatedPlayers),
       d2PlatformShare: Math.round(d2Share),
       activityTypesPresent: estimateActivityPopulation(d2Only).filter(a => a.estimatedPlayers > 0)
