@@ -1,14 +1,18 @@
 {
   "name": "destiny-marathon-counter",
-  "version": "1.0.0",
-  "description": "Live player count counter for Destiny 2 vs Marathon",
+  "version": "2.0.0",
+  "description": "Destiny 2 vs Marathon player count tracker with Destiny 2 analytics",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "setup-env": "powershell -Command \"if (-not (Test-Path .env)) { Copy-Item .env.example .env }\""
   },
   "dependencies": {
-    "express": "^4.18.2",
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "node-cron": "^3.0.3",
     "sharp": "^0.34.5"
   }
 }
