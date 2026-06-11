@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Destiny 2 Legacy — Farewell, Guardians</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+.hero { text-align: center; padding: 60px 20px 40px; position: relative; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,153,255,0.06) 0%, transparent 70%); pointer-events: none; }
+.hero-icon { font-size: 48px; margin-bottom: 16px; }
+.hero h1 { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #fff; margin-bottom: 8px; }
+.hero .dates { font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 3px; }
+.hero .farewell { font-size: 14px; color: rgba(255,255,255,0.5); margin-top: 16px; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+
+.countdown { display: flex; justify-content: center; gap: 16px; margin: 20px 0; }
+.countdown-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px 20px; text-align: center; min-width: 70px; }
+.countdown-num { font-size: 36px; font-weight: 900; color: #0099ff; letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.countdown-label { font-size: 9px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+.timeline { position: relative; padding: 20px 0; margin: 20px 0; }
+.timeline::before { content: ''; position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.06); }
+.timeline-item { position: relative; padding: 0 0 16px 48px; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-dot { position: absolute; left: 13px; top: 6px; width: 16px; height: 16px; border-radius: 50%; background: #0a0a0f; border: 2px solid rgba(255,255,255,0.1); }
+.timeline-dot.end { border-color: #0099ff; background: rgba(0,153,255,0.2); }
+.timeline-date { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.2); letter-spacing: 1px; margin-bottom: 2px; }
+.timeline-event { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.4; }
+.timeline-item:last-child .timeline-event { color: #0099ff; font-weight: 600; }
+
+.content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+.content-card { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; transition: border-color 0.2s; }
+.content-card:hover { border-color: rgba(255,255,255,0.12); }
+.content-card.raid { border-left: 3px solid #ff6b6b; }
+.content-card.dungeon { border-left: 3px solid #845ef7; }
+.content-card .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.content-card .card-title { font-size: 14px; font-weight: 700; color: #fff; }
+.content-card .card-sub { font-size: 10px; color: rgba(255,255,255,0.2); }
+.content-card .card-desc { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.5; margin-bottom: 12px; }
+.content-card .card-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.content-card .card-links a { padding: 4px 12px; border-radius: 6px; font-size: 10px; font-weight: 600; text-decoration: none; letter-spacing: 0.5px; transition: all 0.2s; }
+.content-card .card-links .guide-link { background: rgba(0,153,255,0.1); border: 1px solid rgba(0,153,255,0.15); color: #0099ff; }
+.content-card .card-links .guide-link:hover { background: rgba(0,153,255,0.2); }
+.content-card .card-links .report-link { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+.content-card .card-links .report-link:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+.content-card .badge-sunset { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 8px; font-weight: 600; background: rgba(239,68,68,0.1); color: #ef4444; margin-left: 6px; }
+
+.filter-bar { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.filter-btn { padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 600; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.3); cursor: pointer; font-family: inherit; transition: all 0.2s; }
+.filter-btn:hover { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.6); }
+.filter-btn.active { background: rgba(0,153,255,0.1); border-color: rgba(0,153,255,0.2); color: #0099ff; }
+
+.guestbook { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+.guestbook-form { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; }
+.guestbook-form h3, .guestbook-entries h3 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.3); margin-bottom: 12px; }
+.guestbook-form input, .guestbook-form textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 12px; color: #fff; font-size: 12px; font-family: inherit; outline: none; margin-bottom: 8px; }
+.guestbook-form input:focus, .guestbook-form textarea:focus { border-color: rgba(0,153,255,0.3); }
+.guestbook-form textarea { resize: vertical; min-height: 60px; }
+.guestbook-form button { background: rgba(0,153,255,0.15); border: 1px solid rgba(0,153,255,0.2); color: #0099ff; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: inherit; }
+.guestbook-form button:hover { background: rgba(0,153,255,0.25); }
+.guestbook-form .char-count { font-size: 10px; color: rgba(255,255,255,0.15); text-align: right; margin-top: -4px; margin-bottom: 8px; }
+.guestbook-entries { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; max-height: 400px; overflow-y: auto; }
+.guestbook-entry { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.guestbook-entry:last-child { border-bottom: none; }
+.guestbook-entry .entry-name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); }
+.guestbook-entry .entry-time { font-size: 9px; color: rgba(255,255,255,0.15); margin-left: 8px; }
+.guestbook-entry .entry-msg { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; line-height: 1.4; }
+.guestbook-entry:first-child .entry-name { color: #0099ff; }
+.guestbook-entry:first-child .entry-msg { color: rgba(255,255,255,0.5); }
+
+.farewell-section { text-align: center; padding: 40px 20px; margin-top: 20px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.04); border-radius: 16px; }
+.farewell-section h2 { font-size: 14px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+.farewell-section p { font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.8; max-width: 600px; margin: 0 auto; }
+
+@media (max-width: 640px) {
+  .content-grid, .guestbook { grid-template-columns: 1fr; }
+  .countdown { gap: 8px; }
+  .countdown-box { min-width: 60px; padding: 12px; }
+  .countdown-num { font-size: 28px; }
+  .hero { padding: 40px 16px 24px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-icon">🪐</div>
+    <h1>Destiny 2</h1>
+    <div class="dates">2017 — 2026</div>
+    <div class="farewell">After nine years, the journey ends. Thank you, Guardians.</div>
+  </div>
+
+  <div class="section-title" style="text-align:center">Final Reset Countdown</div>
+  <div class="countdown" id="countdown">
+    <div class="countdown-box"><div class="countdown-num" id="cd-days">--</div><div class="countdown-label">Days</div></div>
+    <div class="countdown-box"><div class="countdown-num" id="cd-hours">--</div><div class="countdown-label">Hours</div></div>
+    <div class="countdown-box"><div class="countdown-num" id="cd-mins">--</div><div class="countdown-label">Minutes</div></div>
+    <div class="countdown-box"><div class="countdown-num" id="cd-secs">--</div><div class="countdown-label">Seconds</div></div>
+  </div>
+
+  <div class="section-title" style="margin-top:24px">The Journey</div>
+  <div class="chart-box" style="padding:16px 20px"><div class="timeline" id="timeline"></div></div>
+
+  <div class="section-title">Activities</div>
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all" onclick="filterContent('all')">All</button>
+    <button class="filter-btn" data-filter="raid" onclick="filterContent('raid')">Raids</button>
+    <button class="filter-btn" data-filter="dungeon" onclick="filterContent('dungeon')">Dungeons</button>
+  </div>
+  <div class="content-grid" id="contentGrid"></div>
+
+  <div class="section-title">Guestbook — Leave Your Memory</div>
+  <div class="guestbook">
+    <div class="guestbook-form">
+      <input type="text" id="gbName" placeholder="Your name (max 30)" maxlength="30">
+      <textarea id="gbMsg" placeholder="Share your Destiny memory..." maxlength="500" oninput="document.getElementById('gbCount').textContent=this.value.length+'/500'"></textarea>
+      <div class="char-count" id="gbCount">0/500</div>
+      <button onclick="postGuestbook()">Sign Guestbook</button>
+      <div id="gbStatus" style="font-size:11px;color:rgba(255,255,255,0.2);margin-top:8px"></div>
+    </div>
+    <div class="guestbook-entries" id="guestbookEntries"><div style="font-size:11px;color:rgba(255,255,255,0.15)">Loading messages...</div></div>
+  </div>
+
+  <div class="farewell-section">
+    <h2>Eyes Up, Guardian</h2>
+    <p>From the Cosmodrome to the Traveler's final stand — we were there.<br><br>
+      <strong style="color:rgba(255,255,255,0.6)">We didn't just play a game. We lived a legend.</strong><br><br>
+      <span style="color:#0099ff;font-size:16px;font-weight:700">Thank you, Guardians. It's been an honor.</span></p>
+  </div>
+
+  <div class="nav-links">
+    <a href="/">← Live Counter</a>
+    <a href="/trends">Trends & Charts</a>
+    <a href="/analytics">D2 Analytics</a>
+    <a href="/streamers">🎥 Streamers</a>
+  </div>
+  <div class="footer">For the Guardians. Always.</div>
+</div>
+
+<script>
+function fmt(n){return(n??0).toLocaleString()}
+let allRaids=[],allDungeons=[];
+
+function renderTimeline(t){document.getElementById('timeline').innerHTML=t.map((item,i)=>{const isLast=i===t.length-1;return`<div class="timeline-item"><div class="timeline-dot ${isLast?'end':''}"></div><div class="timeline-date">${new Date(item.date).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}</div><div class="timeline-event">${item.event}</div></div>`}).join('')}
+
+function renderCards(raids,dungeons,filter){
+  const grid=document.getElementById('contentGrid');
+  let html='';
+  if(filter==='all'||filter==='raid')html+=raids.map(r=>`<div class="content-card raid"><div class="card-header"><div><div class="card-title">${r.name}${r.sunset?'<span class="badge-sunset">Sunset</span>':'<span class="badge-sunset" style="background:rgba(34,197,94,0.1);color:#22c55e">Active</span>'}</div><div class="card-sub">${r.release} · ${r.players}P · ${r.location}</div></div><div style="font-size:20px;opacity:0.3">🏛️</div></div><div class="card-desc">${r.description}</div><div class="card-links"><a class="guide-link" href="${r.guideUrl}" target="_blank">📺 YouTube Guides</a><a class="report-link" href="https://www.raid.report/" target="_blank">📊 raid.report</a><a class="report-link" href="https://lowlidev.com.au/destiny/" target="_blank">🗺️ Maps</a></div></div>`).join('');
+  if(filter==='all'||filter==='dungeon')html+=dungeons.map(d=>`<div class="content-card dungeon"><div class="card-header"><div><div class="card-title">${d.name}</div><div class="card-sub">${d.release} · ${d.players}P · ${d.location}</div></div><div style="font-size:20px;opacity:0.3">⚔️</div></div><div class="card-desc">${d.description}</div><div class="card-links"><a class="guide-link" href="${d.guideUrl}" target="_blank">📺 YouTube Guides</a><a class="report-link" href="https://dungeon.report/" target="_blank">📊 dungeon.report</a><a class="report-link" href="https://lowlidev.com.au/destiny/" target="_blank">🗺️ Maps</a></div></div>`).join('');
+  grid.innerHTML=html||'<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.2)">Nothing to show</div>';
+}
+function filterContent(type){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===type));renderCards(allRaids,allDungeons,type)}
+
+async function loadLegacy(){
+  try{
+    const r=await fetch('/api/legacy/all');const d=await r.json();
+    allRaids=d.raids;allDungeons=d.dungeons;
+    renderTimeline(d.timeline);renderCards(d.raids,d.dungeons,'all');
+  }catch(e){document.getElementById('contentGrid').innerHTML='<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.2)">Failed to load</div>'}
+}
+
+let cdInterval;
+function startCountdown(){
+  async function tick(){
+    try{
+      const r=await fetch('/api/countdown');const d=await r.json();
+      if(d.isOver){document.getElementById('countdown').innerHTML='<div style="text-align:center;padding:20px;color:#0099ff;font-size:16px;font-weight:700">The journey has ended. Thank you, Guardians.</div>';clearInterval(cdInterval);return}
+      document.getElementById('cd-days').textContent=d.days;document.getElementById('cd-hours').textContent=String(d.hours).padStart(2,'0');document.getElementById('cd-mins').textContent=String(d.minutes).padStart(2,'0');document.getElementById('cd-secs').textContent=String(d.seconds).padStart(2,'0');
+    }catch(e){}
+  }
+  tick();cdInterval=setInterval(tick,1000);
+}
+
+async function loadGuestbook(){
+  try{
+    const r=await fetch('/api/guestbook');const d=await r.json();
+    const el=document.getElementById('guestbookEntries');
+    if(!d.entries.length){el.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.15)">No messages yet. Be the first to leave a memory!</div>';return}
+    el.innerHTML=d.entries.slice(0,30).map(e=>`<div class="guestbook-entry"><div><span class="entry-name">${escHtml(e.name)}</span><span class="entry-time">${timeAgo(e.time)}</span></div><div class="entry-msg">${escHtml(e.message)}</div></div>`).join('');
+  }catch(e){}
+}
+
+function escHtml(s){if(!s)return '';return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function timeAgo(ts){const m=Math.floor((Date.now()-ts)/60000);if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago'}
+
+async function postGuestbook(){
+  const name=document.getElementById('gbName').value.trim();
+  const msg=document.getElementById('gbMsg').value.trim();
+  const status=document.getElementById('gbStatus');
+  if(!name||!msg){status.textContent='Fill in both fields';status.style.color='#ef4444';return}
+  try{
+    const r=await fetch('/api/guestbook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,message:msg})});
+    const d=await r.json();
+    if(d.success){status.textContent='Message posted!';status.style.color='#22c55e';document.getElementById('gbName').value='';document.getElementById('gbMsg').value='';document.getElementById('gbCount').textContent='0/500';loadGuestbook()}
+    else{status.textContent=d.error||'Error';status.style.color='#ef4444'}
+  }catch(e){status.textContent='Failed: '+e.message;status.style.color='#ef4444'}
+}
+
+loadLegacy();startCountdown();loadGuestbook();
+</script>
+</body>
+</html>

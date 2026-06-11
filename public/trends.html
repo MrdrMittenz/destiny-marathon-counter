@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Count Trends - Destiny 2 vs Marathon</title>
+<link rel="stylesheet" href="/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+.stat-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+.stat-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px; text-align: center; }
+.stat-card .label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.25); margin-bottom: 6px; }
+.stat-card .value { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+.stat-card .value.d2 { color: #0099ff; }
+.stat-card .value.mara { color: #ff6b00; }
+.stat-card .sub { font-size: 10px; color: rgba(255,255,255,0.2); margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .stat-cards { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<div class="container">
+  <div class="header">
+    <h1>Player Count Trends</h1>
+    <div class="subtitle">Historical concurrent player data</div>
+    <div class="update-status" id="status">Loading...</div>
+  </div>
+
+  <div class="stat-cards" id="statCards"></div>
+
+  <div class="range-selector">
+    <button class="range-btn active" data-range="24h">24H</button>
+    <button class="range-btn" data-range="7d">7D</button>
+    <button class="range-btn" data-range="30d">30D</button>
+    <button class="range-btn" data-range="all">ALL</button>
+  </div>
+
+  <div class="chart-box">
+    <div class="section-title">Concurrent Players Over Time</div>
+    <canvas id="mainChart"></canvas>
+  </div>
+
+  <div class="chart-box">
+    <div class="section-title">Destiny 2 Share %</div>
+    <canvas id="shareChart"></canvas>
+  </div>
+
+  <div class="nav-links">
+    <a href="/">← Live Counter</a>
+    <a href="/analytics">D2 Analytics</a>
+    <a href="/legacy" style="border-color:rgba(0,153,255,0.2);color:#0099ff">🏛️ Destiny Legacy</a>
+  </div>
+
+  <div class="footer">Data from Steam API — collected every 15s</div>
+</div>
+
+<script>
+let mainChart = null;
+let shareChart = null;
+
+function fmt(n) { return (n ?? 0).toLocaleString(); }
+
+function timeAgo(ts) {
+  const mins = Math.floor((Date.now() - ts) / 60000);
+  if (mins < 60) return mins + 'm ago';
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return hrs + 'h ' + (mins % 60) + 'm ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function buildStatsCards(data, range) {
+  const d2Vals = data.map(e => e.d2).filter(v => v != null);
+  const maraVals = data.map(e => e.mara).filter(v => v != null);
+  if (!d2Vals.length) return;
+
+  const d2Peak = Math.max(...d2Vals);
+  const d2Min = Math.min(...d2Vals);
+  const d2Avg = Math.round(d2Vals.reduce((a, b) => a + b, 0) / d2Vals.length);
+  const maraPeak = Math.max(...maraVals);
+  const maraMin = Math.min(...maraVals);
+  const maraAvg = Math.round(maraVals.reduce((a, b) => a + b, 0) / maraVals.length);
+
+  const cards = document.getElementById('statCards');
+  const rangeLabel = { '24h': '24h', '7d': '7 days', '30d': '30 days', 'all': 'All time' }[range] || range;
+
+  cards.innerHTML = `
+    <div class="stat-card">
+      <div class="label">${rangeLabel} Peak D2</div>
+      <div class="value d2">${fmt(d2Peak)}</div>
+      <div class="sub">Min: ${fmt(d2Min)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${rangeLabel} Avg D2</div>
+      <div class="value d2">${fmt(d2Avg)}</div>
+      <div class="sub">${d2Vals.length.toLocaleString()} samples</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${rangeLabel} Peak Marathon</div>
+      <div class="value mara">${fmt(maraPeak)}</div>
+      <div class="sub">Min: ${fmt(maraMin)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">${rangeLabel} Avg Marathon</div>
+      <div class="value mara">${fmt(maraAvg)}</div>
+      <div class="sub">${maraVals.length.toLocaleString()} samples</div>
+    </div>
+  `;
+}
+
+function downsample(data, maxPoints) {
+  if (data.length <= maxPoints) return data;
+  const step = Math.ceil(data.length / maxPoints);
+  const result = [];
+  for (let i = 0; i < data.length; i += step) {
+    result.push(data[i]);
+  }
+  if (result[result.length - 1] !== data[data.length - 1]) {
+    result.push(data[data.length - 1]);
+  }
+  return result;
+}
+
+function formatTime(ts, range) {
+  const d = new Date(ts);
+  if (range === '24h') return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (range === '7d') return d.toLocaleDateString([], { weekday: 'short', hour: '2-digit' });
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+}
+
+function renderCharts(data, range) {
+  const sampled = downsample(data, 500);
+  const labels = sampled.map(e => formatTime(e.t, range));
+  const d2Data = sampled.map(e => e.d2);
+  const maraData = sampled.map(e => e.mara);
+
+  const ctx = document.getElementById('mainChart').getContext('2d');
+  if (mainChart) mainChart.destroy();
+
+  mainChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Destiny 2',
+          data: d2Data,
+          borderColor: '#0099ff',
+          backgroundColor: 'rgba(0,153,255,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          borderWidth: 2
+        },
+        {
+          label: 'Marathon',
+          data: maraData,
+          borderColor: '#ff6b00',
+          backgroundColor: 'rgba(255,107,0,0.08)',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: { color: 'rgba(255,255,255,0.5)', font: { size: 11 }, usePointStyle: true }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.9)',
+          titleColor: '#fff',
+          bodyColor: 'rgba(255,255,255,0.8)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: ctx => ctx.dataset.label + ': ' + fmt(ctx.parsed.y)
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: 'rgba(255,255,255,0.2)', font: { size: 10 }, maxRotation: 45 },
+          grid: { color: 'rgba(255,255,255,0.03)' }
+        },
+        y: {
+          ticks: { color: 'rgba(255,255,255,0.2)', font: { size: 10 }, callback: v => fmt(v) },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          beginAtZero: true
+        }
+      }
+    }
+  });
+
+  const shareCtx = document.getElementById('shareChart').getContext('2d');
+  if (shareChart) shareChart.destroy();
+
+  const shareData = sampled.map(e => {
+    const total = e.d2 + e.mara;
+    return total > 0 ? (e.d2 / total * 100) : 50;
+  });
+
+  shareChart = new Chart(shareCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'D2 Share %',
+        data: shareData,
+        borderColor: '#0099ff',
+        backgroundColor: 'rgba(0,153,255,0.08)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          labels: { color: 'rgba(255,255,255,0.5)', font: { size: 11 }, usePointStyle: true }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,15,0.9)',
+          titleColor: '#fff',
+          bodyColor: 'rgba(255,255,255,0.8)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: ctx => 'D2: ' + ctx.parsed.y.toFixed(1) + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: 'rgba(255,255,255,0.2)', font: { size: 10 }, maxRotation: 45 },
+          grid: { color: 'rgba(255,255,255,0.03)' }
+        },
+        y: {
+          ticks: { color: 'rgba(255,255,255,0.2)', font: { size: 10 }, callback: v => v.toFixed(0) + '%' },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          min: 0,
+          max: 100
+        }
+      }
+    }
+  });
+}
+
+async function loadData(range) {
+  const status = document.getElementById('status');
+  try {
+    status.textContent = 'Loading ' + range + ' data...';
+    status.className = 'update-status';
+
+    const res = await fetch('/api/players/history?range=' + range);
+    const json = await res.json();
+
+    document.querySelectorAll('.range-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.range === range);
+    });
+
+    if (json.data && json.data.length > 0) {
+      buildStatsCards(json.data, range);
+      renderCharts(json.data, range);
+      status.textContent = json.count.toLocaleString() + ' data points • ' + range;
+      status.className = 'update-status live';
+    } else {
+      status.textContent = 'No data for this range yet — keep the server running!';
+      status.className = 'update-status stale';
+    }
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+    status.className = 'update-status stale';
+  }
+}
+
+document.querySelectorAll('.range-btn').forEach(btn => {
+  btn.addEventListener('click', () => loadData(btn.dataset.range));
+});
+
+loadData('24h');
+</script>
+</body>
+</html>
